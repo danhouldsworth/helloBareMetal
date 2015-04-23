@@ -13,4 +13,21 @@ On the other hand, if we scrapped the Linux OS, we have a great piece of physica
 * Schedular
 * Serial Port - Hello, world!
 
+# Build environments
 
+### AVR 8-bit
+
+		brew install avrdude
+		brew tap larsimmisch/avr
+		brew install avr-libc // avr-gcc is a dependancy of avr-libc
+
+### ARM-cortex
+
+		brew tap PX4/homebrew-px4
+		brew install gcc-arm-none-eabi
+
+
+# Questions
+
+* Understand how ```avrdude```, ```avr-gcc``` and ```avr-libc``` differ and depend.
+* Is the build parameter ```avrdude --with-usb``` actually doing anything? Doesn't seem to be used in the brew formula, unless being passed to dependancies?
