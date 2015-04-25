@@ -17,8 +17,8 @@ On the other hand, if we scrapped the Linux OS, we have a great piece of physica
 
 ### AVR 8-bit
 
-		brew install avrdude
-		brew tap larsimmisch/avr
+		brew install avrdude avra
+		brew tap larsimmisch/homebrew-avr
 		brew install avr-libc // avr-gcc is a dependancy of avr-libc
 
 ### ARM-cortex
@@ -31,3 +31,11 @@ On the other hand, if we scrapped the Linux OS, we have a great piece of physica
 
 * Understand how ```avrdude```, ```avr-gcc``` and ```avr-libc``` differ and depend.
 * Is the build parameter ```avrdude --with-usb``` actually doing anything? Doesn't seem to be used in the brew formula, unless being passed to dependancies?
+* What does it mean for Yosemite if there's only formula specified for Mavericks, Mountain Lion etc.?
+
+# Developer environment quirks / notes
+
+* Install Silcone Labs driver (dongle straight to pins / jumpers) : Install SiliconLabs CP210x Macintosh OSX VCP Driver v3.1 or from my BitBucket
+==> Needed for USB / PWM ESC programmer
+
+* Mac OSX Yosemite not recognising atmega32u4 /dev/tty.usbmodemxxxxx - need to reset by shorting RST pin to ground which enables it for a few seconds window.
