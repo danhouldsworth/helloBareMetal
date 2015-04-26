@@ -1,3 +1,9 @@
+# **************************** Select Task Solution ****************************
+TARGET = main1_StdUseOfAVRlibs.c
+TARGET = main1_DirectRegisterAddressing.c
+TARGET = main2.c
+# ******************************************************************************
+
 # **************************** Device & Programmer ****************************
 DEVICE = atmega328p
 CLOCK = 16000000
@@ -13,8 +19,10 @@ PROGRAMMER = -c avrisp2 -P /dev/tty.usbmodem00065771
 AVRDUDE = avrdude $(PROGRAMMER) -p $(DEVICE)
 # ******************************************************************************
 
-all:
-	avr-gcc -Wall -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) main.c -o main.elf
+all: build
+
+build:
+	avr-gcc -Wall -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) $(TARGET) -o main.elf
 	avr-objcopy -O ihex main.elf main.hex
 	avr-size --format=avr --mcu=$(DEVICE) main.hex
 
