@@ -1,7 +1,7 @@
 # **************************** Select Task Solution ****************************
-TARGET = main1_StdUseOfAVRlibs.c
-TARGET = main1_DirectRegisterAddressing.c
-TARGET = main2.c
+# TARGET = main1.c
+TARGET = bonus.c
+# TARGET = main2.c
 # ******************************************************************************
 
 # **************************** Device & Programmer ****************************
