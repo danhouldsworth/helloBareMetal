@@ -1,0 +1,189 @@
+/*
+
+1) Summary of useful GPIO pins, the timers & channels they can be attached to, and their physical mapping on the board
+======================================================================================================================
+
+ATmega32u4 	AVR Name 	Timer			Port 	NanoWii
+--------------	----------	----------------	----	---------------
+Package pin 25	ICP1/ ADC8	-			PB4	4
+Package pin 29	OC1A/#OC4B	1 chanA (16-bit)	PB5	9 (BackRight)
+Package pin 30	OC1B/ OC4B	1 chanB (16-bit)	PB6	10 (FrontRight)
+Package pin 12	OC1C/ OC0A	1 chanC (16-bit)	PB7	11
+Package pin 31	OC3A/#OC4A	3 chanA (16-bit)	PC6	5 (BackLeft)
+Package pin 32	OC4A	 	4 chanA	(10-bit)	PC7	13
+Package pin 18	OC0B/ SCL	0 chanB (8-bit)		PD0	I2C/SCL
+Package pin 19	SDA		-			PD1	I2C/SDA
+Package pin 22	XCK1/#CTS	-			PD5	GreenLED
+Package pin 27	OC4D		4 chanD (10-bit)	PD7	6 (FrontLeft)
+
+
+2) Registers controlling the input / ouput on the GPIO pins
+===========================================================
+
+DDRB/C/D 	- Data Direction Register  		(0)input / (1)output for each of 8 Port pins*
+PORTB/C/D	- Pin Output Register 		 	(0)Low / (1)High for each of 8 pins
+PINB/C/D 	- Pin Input Register** 			(0)Low / (1)High for each of 8 pins
+
+* Not all 8 pins per port will exist.
+** Despite seeing it done, I've yet to find a clear explanation for whether we can always read a pin set to output.
+
+
+3) Registers controlling each timer, and associated output channels
+===================================================================
+
+Timer/Counter #0 (8-bit) - Channels A & B
+-------------------------------------------------------	7	6 	5 	4 	3 	2 	1 	0
+OCR0A 		- Output Compare Register A
+OCR0B 		- Output Compare Register B
+TCNT0		- Counter Register 8-bit
+TCCR0A		- Timer Counter Control Register A 	COM0A1 	COM0A0	COM0B1 	COM0B0 	- 	- 	WGM01 	WGM00
+TCCR0B 		- Timer Counter Control Register B 	FOC0A	FOC0B	–	–	WGM02	CS02	CS01	CS00
+TIMSK0 		- Timer Interrupt Mask Register  	- 	- 	- 	- 	- 	OCIE0B 	OCIE0A 	TOIE0
+TIFR0 		- Timer Interrupt Flag Register 	- 	- 	- 	- 	- 	OCF0B 	OCF0A 	TOV0
+
+Timer/Counter #1 (16-bit) - Channels A, B & C
+-------------------------------------------------------	7	6 	5 	4 	3 	2 	1 	0
+OCR1AH 		- Output Compare Register A High Byte
+OCR1AL 		- Output Compare Register A Low Byte
+OCR1BH 		- Output Compare Register B High Byte
+OCR1BL 		- Output Compare Register B Low Byte
+OCR1CH 		- Output Compare Register C High Byte
+OCR1CL 		- Output Compare Register C Low Byte
+TCNT1H 		- Counter Register High Byte
+TCNT1L 		- Counter Register Low Byte
+TCCR1A		- Timer Counter Control Register A 	COM1A1 	COM1A0 	COM1B1 	COM1B0 	COM1C1 	COM1C0 	WGM11 	WGM10
+TCCR1B		- Timer Counter Control Register B 	ICNC1 	ICES1	- 	WGM13 	WGM12 	CS12 	CS11 	CS10
+TCCR1C		- Timer Counter Control Register C 	FOC1A 	FOC1B	FOC1C	-	-	-	-	-
+ICR1H 		- Input Capture Register High Byte
+ICR1L 		- Input Capture Register Low Byte
+TIMSK1 		- Timer Interrupt Mask Register  	-	- 	ICIE1 	-	OCIE1C 	OCIE1B 	OCIE1A 	TOIE1
+TIFR1 		- Timer Interrupt Flag Register 	-	-	ICF1	-	OCF1C	OCF1B	OCF1A	TOV1
+
+
+Timer/Counter #3 (16-bit)
+-------------------------------------------------------	7	6 	5 	4 	3 	2 	1 	0
+OCR3AH 		- Output Compare Register A High Byte
+OCR3AL 		- Output Compare Register A Low Byte
+OCR3BH 		- Output Compare Register B High Byte
+OCR3BL 		- Output Compare Register B Low Byte
+OCR3CH 		- Output Compare Register C High Byte
+OCR3CL 		- Output Compare Register C Low Byte
+TCNT3H 		- Counter Register High Byte
+TCNT3L 		- Counter Register Low Byte
+TCCR3A		- Timer Counter Control Register A 	COM3A1 	COM3A0 	COM3B1 	COM3B0 	COM3C1 	COM3C0 	WGM31 	WGM30
+TCCR3B		- Timer Counter Control Register B 	ICNC3 	ICES3 	- 	WGM33 	WGM32 	CS32 	CS31 	CS30
+TCCR3C		- Timer Counter Control Register C 	FOC3A	-	-	-	-	-	-	-
+ICR3H 		- Input Capture Register High Byte
+ICR3L 		- Input Capture Register Low Byte
+TIMSK3 		- Timer Interrupt Mask Register  	-	- 	ICIE3 	-	OCIE3C 	OCIE3B 	OCIE3A 	TOIE3
+TIFR3 		- Timer Interrupt Flag Register 	-	-	ICF3	-	OCF3C	OCF3B	OCF3A	TOV3
+
+Timer/Counter #4 (10-bit) with 64Mhz PLL*
+-------------------------------------------------------	7	6 	5 	4 	3 	2 	1 	0
+OCR4A		- Output Compare Register A
+OCR4B		- Output Compare Register B
+OCR4C		- Output Compare Register C
+OCR4D		- Output Compare Register D
+TC4H		- High Byte**
+TCNT4		- Counter Register Low Byte
+TCCR4A		- Timer Counter Control Register A 	COM4A1 	COM4A0 	COM4B1 	COM4B0 	FOC4A 	FOC4B 	PWM4A 	PWM4B
+TCCR4B		- Timer Counter Control Register B 	PWM4X 	PSR4 	DTPS41 	DTPS40 	CS43 	CS42 	CS41 	CS40
+TCCR4C		- Timer Counter Control Register C 	COM4A1S	COM4A0S	COM4B1S	COM4B0S	COM4D1S	COM4D0S	FOC4D 	PWM4D
+TCCR4D		- Timer Counter Control Register D 	FPIE4	FPEN4	FPNC4	FPES4	FPAC4	FPF4	WGM41	WGM40
+TCCR4E		- Timer Counter Control Register E 	TLOCK4	ENHC4	OC4OE5	OC4OE4	OC4OE3	OC4OE2	OC4OE1	OC4OE0
+TIFR4 		- Timer Interrupt Flag Register 	OCF4D	OCF4A	OCF4B	-	-	TOV4	-	-
+
+* PLL - Phase Loop Lock?
+** I recall that you have to put the high byte into temp first and then write the low byte. See Datasheet 14.2, 15.11
+
+
+4a) Bit names & settings for TCCRx (Timer Counter Control Register):
+====================================================================
+
+Waveform Generation Mode - bit settings (per Timer)
+---------------------------------------------------
+Mode 	WGMx3:2:1:0 	TOP	Mode
+0 	0000 		0xffff	Normal
+1 	0001 		0x00ff	Phase Correc PWM 8-bit
+2 	0010 		0x01ff	Phase Correc PWM 9-bit
+3 	0011 		0x03ff	Phase Correc PWM 10-bit
+4 	0100 		OCRxA	CTC
+5 	0101 		0x00ff	Fast PWM 8-bit
+6 	0110 		0x01ff	Fast PWM 9-bit
+7 	0111 		0x03ff	Fast PWM 10-bit
+8 	1000 		ICRx	Phase & Freq Correct PWM
+9 	1001 		OCRxA	Phase & Freq Correct PWM
+10 	1010 		ICRx	Phase Correct PWM
+11 	1011 		OCRxA	Phase Correct PWM
+12 	1100 		ICRx	CTC
+13 	1101 		-	-
+14 	1110 		ICRx	Fast PWM
+15 	1111 		OCRxA	Fast PWM
+
+* For all PWM modes OCR is updated when counter at TOP rollover for glitch free PWM.
+
+Compare Output Mode - bit settings (per Channel per Timer)
+----------------------------------------------------------
+COMxx1	COMxx0	Effect:
+0	0	OCxx diconnected
+0	1	Reserved
+1	0	Non-inverting* PWM (Clear OCxx on match, clear OCxx on TOP)
+1	1	Inverting* PWM (Set OCxx on match, clear OCxx on TOP)
+
+* Intuitivly, this means duty-cycle increases with increasing OCR. Whereas Inverting decreases duty-cycle with increasing OCR
+
+Clock Select - bit settings (per Timer) **This is for 16-bit, can change for different timers**
+-----------------------------------------------------------------------------------------------
+CSx2	CSx1	CSx0	Mode Description
+0 	0	0 	Stop Timer/Counter x
+0	0	1	No Prescaler (Timer Clock = System Clock)
+0	1	0	divide clock by 8
+0	1	1	divide clock by 64
+1	0	0	divide clock by 256
+1	0	1	divide clock by 1024
+1	1	0	increment timer 1 on Tx Pin falling edge
+1	1	1	increment timer 1 on Tx Pin rising edge
+
+ICNCx - Input Capture Noise Canceler. If set the noise canceler on the ICP pin is activated and will get 4 equal samples.
+ICESx - Input Capture Edge Select. TCNTx copied to ICRx on rising edge(1) or falling edge(0) of ICP pin.
+CTCx  - Clear Timer Counter. Resets TNCTx on compare (note this will never overflow, but will produce compare interupts)
+FOCxx - Force Output Compare. Reflects a postive compare on OCxx. No interupt. No clear. Not used in PWM. Write only.
+
+
+4b) Bit names & settings for TIMSKx (Timer Interrupt Mask Register):
+====================================================================
+TOIEx 		- Timer Overflow Interrupt Enable. (If set jumps to TIMERx_OVF_vect on overflow)
+ICIEx		- Interrupt Capture Interrupt Enable. (If set jumps Input Capture Vector on input capture)
+OCIExx 		- Output Compare Interrupt Enable. (If set Output Compare Vector on compare match)
+
+* Only work if global interupts also set!
+
+4c) Bit names & settings for TIFRx (Timer Interrupt Flag Register):
+===================================================================
+Only holds the interrupt flags corresponding to TIMSKx. Probably easier to just enable and use interupts?
+
+5) Interrupts
+
+// ISR(TIMER0_COMPB_vect){}
+// ISR(TIMER0_COMPA_vect){}
+// ISR(WDT_vect){}
+// ISR(USB_COM_vect){}
+// ISR(USB_GEN_vect){}
+// ISR(USART1_RX_vect){}
+// ISR(USART1_UDRE_vect){}
+// ISR(USART1_TX_vect){}
+// ISR(EE_READY_vect){}
+// ISR(SPM_READY_vect){}
+// ISR(__vector_default){}
+
+
+Helpful resources :
+-------------------
+http://www.avrbeginners.net/
+http://maxembedded.com/
+http://www.societyofrobots.com/programming_timers.shtml
+Explanation of register bit settings - http://www.societyofrobots.com/member_tutorials/book/export/html/228
+Useful tutorials - http://maxembedded.com/2011/07/14/avr-timers-ctc-mode/
+Pin mapping - http://arduino.cc/en/Hacking/PinMapping32u4
+
+*/

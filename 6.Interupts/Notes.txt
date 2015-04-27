@@ -1,0 +1,25 @@
+
+5) Interrupts
+
+// ISR(TIMER0_COMPB_vect){}
+// ISR(TIMER0_COMPA_vect){}
+// ISR(WDT_vect){}
+// ISR(USB_COM_vect){}
+// ISR(USB_GEN_vect){}
+// ISR(USART1_RX_vect){}
+// ISR(USART1_UDRE_vect){}
+// ISR(USART1_TX_vect){}
+// ISR(EE_READY_vect){}
+// ISR(SPM_READY_vect){}
+// ISR(__vector_default){}
+
+
+Helpful resources :
+-------------------
+http://www.avrbeginners.net/
+http://maxembedded.com/
+http://www.societyofrobots.com/programming_timers.shtml
+http://www.avr-asm-tutorial.net/avr_en/beginner/index.html
+Explanation of register bit settings - http://www.societyofrobots.com/member_tutorials/book/export/html/228
+Useful tutorials - http://maxembedded.com/2011/07/14/avr-timers-ctc-mode/
+Pin mapping - http://arduino.cc/en/Hacking/PinMapping32u4
