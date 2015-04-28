@@ -1,33 +1,40 @@
 .DEVICE ATmega328p
 
-.nolist
-; .include "../Reference/Libs/m328Pdef.inc"
-.list
+.def    LEDstate   = r17                ; Use .def to label a register
+.def    counter    = r18
+.def    ZH         = r31
+.def    ZL         = r30
+
+.equ    DDR        = 0x04               ; Use .equ to label a value
+.equ    PORTB      = 0x05
+.equ    outer1byte = 25                 ; Outer loop of 25, inner loop of 40000 with SBIW & BRNE taking 2clocks each
+.equ    inner2byte = 40000              ; Makes 25x40000x4(x2 on/off) = 8million cycles. Our chip is 8MHz === ~1second :-)
+
+.cseg
+.org 0x0000
+
         rjmp    main
 main:
         ldi     r16, 1 << 4             ; Set GPIO PinB4 to OUT
-        out     0x04,r16
+        out     DDR,r16
 
-        mov     r17, r16                ; r17 is our LED state (aka PinB4 = ON) [For interest, use the same value for DDR]
+        mov     LEDstate, r16           ; r17 is our LED state (aka PinB4 = ON) [For interest, use the same value for DDR]
 
-                                        ; Outer loop of 100, inner loop of 40000 with SBIW & BRNE taking 2clocks each
-                                        ; Makes 100x40000x4 = 16million cycles. Our chip is 16MHZ === ~1second :-)
 loop:
-        com     r17                     ; 1's complement (aka toggle all PortB Pin's)
-        out     0x05,r17                ; write to the PortB Pins
+        com     LEDstate                ; 1's complement (aka toggle all PortB Pin's)
+        out     PORTB,LEDstate          ; write to the PortB Pins
 
-        ldi     r18,100                 ; r18 is our outer loop counter
+        ldi     counter,outer1byte      ; r18 is our outer loop counter
 
 outer:
-        ldi     r31,HIGH(40000)
-        ldi     r30,LOW(40000)
+        ldi     ZH,HIGH(inner2byte)
+        ldi     ZL,LOW(inner2byte)
 
 inner:
-        sbiw    r30,1
+        sbiw    ZL,1                    ; SuBtract Immediate from Word (ie 2 byte reg)
         brne    inner
 
-        dec     r18
+        dec     counter
         brne    outer
 
         rjmp    loop
-

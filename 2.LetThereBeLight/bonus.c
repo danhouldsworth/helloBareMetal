@@ -4,7 +4,7 @@ int main(void) {
 
         // Notice : int, uint and char* are 16-bit whereas char is 8-bit
 
-        // I need to better understand the memory mapping. The offset isn't needed in assembler, so maybe our program is sitting in different space?
+        // The offset isn't needed in assembler which directly accesses the register by name, whereas C treats as a memory address.
         unsigned int OFFSET         = 0x0020;
         // --
 

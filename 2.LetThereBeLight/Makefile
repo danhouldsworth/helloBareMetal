@@ -30,7 +30,7 @@ asm:
 	avra -fI main.asm
 
 clean:
-	@rm -f *.cof *.hex *.obj
+	@rm -f *.cof *.hex *.obj *.elf
 
 flash:
 	$(AVRDUDE) -U flash:w:main.hex:i
