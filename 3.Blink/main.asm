@@ -13,7 +13,7 @@
 .cseg
 .org 0x0000
 
-        rjmp    main
+        jmp    main
 main:
         ldi     r16, 1 << 4             ; Set GPIO PinB4 to OUT
         out     DDR,r16

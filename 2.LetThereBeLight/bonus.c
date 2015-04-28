@@ -4,8 +4,7 @@ int main(void) {
 
         // Notice : int, uint and char* are 16-bit whereas char is 8-bit
 
-        // The offset isn't needed in assembler which directly accesses the register by name, whereas C treats as a memory address.
-        unsigned int OFFSET         = 0x0020;
+        unsigned int OFFSET         = 0x0020; // The 32 general purpose registers come first in Data memory, then IO regs..
         // --
 
         unsigned int DDRB_addr      = 0x0004 + OFFSET;

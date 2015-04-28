@@ -3,7 +3,9 @@
 PreRead : Read and list all the interupts available for our chip
 
 1. Enable the interupt for (and disable all others) a pin input. Act on it to flash a LED for 1 second.
-2. Repeat but using the Serial Rx UART interupt.
+2. Use the interrupt to have a push button reliably toggle between 2 LEDs.
+3. Show the multitasking cababilities by controlling LED1, while LED2 is steadily blinking
+4. Repeat but using the Serial Rx UART interupt. (Parking downhill!)
 
 
 ## Bonus

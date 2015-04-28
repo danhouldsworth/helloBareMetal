@@ -10,7 +10,7 @@
 
 .equ    counter    = 0xffff             ; Makes 65536x(2+4+2)(x2 on/off) = ~1million cycles. So blink @ 8Hz
 
-        rjmp    main
+        jmp    main
 main:
         ldi     r16, 1 << 7
         out     DDRB,r16

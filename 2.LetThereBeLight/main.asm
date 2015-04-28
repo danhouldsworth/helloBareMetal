@@ -1,7 +1,7 @@
 .DEVICE ATmega328p
 
-        rjmp      directPortAccess
-        ; rjmp      memoryAddressing
+        jmp      directPortAccess
+        ; jmp      memoryAddressing
         ; *******************************************************************************************
         ; ** Direct method - fastest, and easy with data sheet
 

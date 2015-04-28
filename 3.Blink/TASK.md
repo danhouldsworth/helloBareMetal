@@ -1,7 +1,7 @@
 # TASK
 
 1. Using a simple blocking delay, blink a LED at roughly 1Hz.
-2. Use NOP to simplify the loop.
+2. Using NOP (but no time libraries!) simplify the loop.
 3. Experiment with different fuse clock settings, and different Chips
 
 ## Notes:

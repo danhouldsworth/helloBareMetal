@@ -6,7 +6,7 @@
 
 .equ    counter    = 0xffff             ; Makes 65536x(2+4+2)(x2 on/off) = ~1million cycles. So blink @ 8Hz
 
-        rjmp    setup
+        jmp    setup
 setup:
         ldi     r16, 0x00
         out     DDRC,r16                ; PORTC as input
