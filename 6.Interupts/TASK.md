@@ -2,7 +2,7 @@
 
 PreRead : Read and list all the interupts available for our chip
 
-1. Enable the interupt for (and diable all others) a pin input. Act on it to flash a LED for 1 second.
+1. Enable the interupt for (and disable all others) a pin input. Act on it to flash a LED for 1 second.
 2. Repeat but using the Serial Rx UART interupt.
 
 

@@ -5,6 +5,7 @@
 
 ## Bonus:
 
-* What would happen if we used a single input switch to toggle the LED?
+* Experiment with using both physical pull up resisters and setting the internal ones.
+* What would happen if we used the input switch to toggle the LED?
 
 ## Notice : The .hex flash is 50 times larger for C than for Assembly!!
