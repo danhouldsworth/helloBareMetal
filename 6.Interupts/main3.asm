@@ -1,5 +1,4 @@
 .include "../Reference/Libs/m328Pdef.inc"
-; .include "../Reference/Libs/tn85def.inc"
 
 .def    LEDstate   = r17                ; Use .def to label a register
 .def    BUTTONstate= r18

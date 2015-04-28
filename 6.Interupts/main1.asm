@@ -35,14 +35,16 @@ setup:
 
         sei
 
-lamp1:
-        com     LEDstate
+loop:   rjmp     loop
+
+lamp:
+        ldi     LEDstate, (1 << PORTB7)      ; We're on PB7 and PD5 so using the same mask will alternate
         out     PORTB,LEDstate
 
         ldi     ZH,HIGH(counter)
         ldi     ZL,LOW(counter)
 
-inner1:
+inner:
         nop
         nop
         nop
@@ -56,22 +58,15 @@ inner1:
         nop
         nop
         sbiw    ZL,1
-        brne    inner1
-        sei
-        rjmp    lamp1
+        brne    inner
+        ldi     LEDstate, 0
+        out     PORTB,LEDstate
+
+        reti
 
 buttonChange:
         in      r16, PINC
         andi    r16, (1 << PINC1)
         cpi     r16, 0x00                ; GND = pressed
-        breq    lamp2
-
-        ldi     r16, 0x00
-        out     PORTD, r16
-        rjmp    return_from_ISR
-lamp2:
-        ldi     r16,  (1 << PORTD5)
-        out     PORTD, r16
-return_from_ISR:
-        cli
+        breq    lamp
         reti
