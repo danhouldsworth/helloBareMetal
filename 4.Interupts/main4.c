@@ -20,19 +20,10 @@ int main(void) {
     setup();
 
     DDRB  |=  (1 << PORTB7);
-
-
-    // DDRD  |=   (1 << PORTD5);
-    // PORTD &=  ~(1 << PORTD5);
     DDRC  &=  ~(1 << PORTC1);       // Clear PinC1 for input (high imedance)
     PORTC |=   (1 << PORTC1);       // Set PinC1 high (enable pull up resister)
 
-    for (;;) {
-        PORTB &= ~(1 << PORTB7);
-        // PORTB = ~PORTB;
-        // PORTD = ~PORTD;
-        // _delay_ms(100);
-    }
+    for (;;) {}
 
     return 0;
 }
