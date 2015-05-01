@@ -12,3 +12,11 @@
 ## Bonus Learning
 
 * What is the watchdog timer. Demonstrate it will reset the chip if we fail to 'pat the dog' in time.
+
+
+## Notes:
+
+BOTTOM  : The counter reaches the BOTTOM when it becomes 0x00.
+MAX     : The counter reaches its MAXimum when it becomes 0xFF (decimal 255).
+TOP     : The counter reaches the TOP when it becomes equal to the highest value in the count sequence.
+The TOP value can be assigned to be the fixed value 0xFF (MAX) or the value stored in the OCRnA Register. The assignment is dependent on the mode of operation.
