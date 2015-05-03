@@ -3,19 +3,33 @@
         ; Set at Clock/64 which will be bit fast => 2.0ms
         ; OR could do at Clock/256 with TOP at 80  => 2.5ms
 
+; So.. testing on a 8MHz clock in WGMode 3 :
+; Prescaler of /8 gives 263us period (correct dutycyle)
+; Prescaler of /256 gives 8400us period (correct dutycyle)
+; We want 0xff * 2500/8400 == 76
+
+; Now, switch to WGMode 7, and set TOP = 76
+
 .include "../Reference/Libs/m328Pdef.inc"
 
 .def    temp            = r16
 
-.equ    dutycycle       = 204                 ; 0xff * 2000us/2500us
+.equ    F_CPU           = 16000000
+.equ    Prescaler       = 256                    ; Don't forget to match the setting below for CS0
+.equ    TargetHz        = 400
+.equ    TOP             = (F_CPU/Prescaler)/TargetHz
+.equ    dutycycle       = TOP * 2000/2500;
 .equ    ON              = 1
 .equ    OFF             = 0
+
+; With a 8MHz internal clock (uncalibrated) we measure 525us / 2580us
+; With a 16MHz external cyrstal we measure 510us / 2510us
 
 ; ***************************** Output Compare - Channel A *****************************
 ;
 .equ    COMA = 0   ;          Normal Pin. OCA disconnected
 ; .equ    COMA = 1   ;          Toggle OC0A on Compare Match
-; .equ    COMA = 2   ;            Clear OC0A on Compare Match. "Non-inverted PWM"
+; .equ    COMA = 2   ;          Clear OC0A on Compare Match. "Non-inverted PWM"
 ; .equ    COMA = 3   ;          Set OC0A on Compare Match "Inverted PWM"
 ;
 ; **************************************************************************************
@@ -33,9 +47,9 @@
 ;
 ; .equ    CS = 0   ; Stopped
 ; .equ    CS = 1   ; x1 (No prescaler)
-.equ    CS = 2   ; /8
+; .equ    CS = 2   ; /8
 ; .equ    CS = 3   ; /64
-; .equ    CS = 4   ; /256
+.equ    CS = 4   ; /256
 ; .equ    CS = 5   ; /1024
 ; .equ    CS = 6   ; External Clock T0 - falling
 ; .equ    CS = 7   ; External Clock T0 - rising
@@ -49,11 +63,11 @@
 ; .equ WGM = 0 ;        Normal                   0xFF    TOP             MAX
 ; .equ WGM = 1 ;        PWM, Phase Correct       0xFF    TOP             BOTTOM
 ; .equ WGM = 2 ;        CTC                      OCRA    Immediate       MAX
-.equ WGM = 3 ;          Fast PWM                 0xFF    BOTTOM          MAX
+; .equ WGM = 3 ;        Fast PWM                 0xFF    BOTTOM          MAX
 ; .equ WGM = 4 ;        Reserved
 ; .equ WGM = 5 ;        PWM, Phase Correct       OCRA    TOP             BOTTOM
 ; .equ WGM = 6 ;        Reserved
-; .equ WGM = 7 ;        Fast PWM                 OCRA    BOTTOM          TOP
+.equ WGM = 7 ;        Fast PWM                 OCRA    BOTTOM          TOP
 ;
 ; **************************************************************************************
 
@@ -85,8 +99,9 @@ setup:
         out     TCNT0, temp
 
         ; Set OCR for dutycycle
-        ldi     temp, dutycycle
+        ldi     temp, TOP
         out     OCR0A, temp             ; TOP=OCR0A in WGMode 13
+        ldi     temp, dutycycle
         out     OCR0B, temp
 
         ; Set the Timer/Counter Control Register for WaveGuideMode, Clock Select & Compare settings
@@ -115,10 +130,6 @@ setup:
         ; ******** END OF SETUP **********
 
 loopForever:
-        rcall   del32ms
-        in      temp, OCR0B
-        inc     temp
-        out     OCR0B, temp
         rjmp    loopForever
 
 
@@ -130,27 +141,3 @@ TIMER0_COMPB_ISR:
 
 TIMER0_OVF_ISR:
         reti
-
-fullSec:rcall halfSec
-halfSec:rcall quart_S
-quart_S:rcall tenth_S
-tenth_S:rcall del64ms
-del64ms:rcall del32ms
-del32ms:rcall del16ms
-del16ms:rcall del_8ms
-del_8ms:rcall del_4ms
-del_4ms:rcall del_2ms
-del_2ms:rcall delayms
-delayms:rcall nops512
-nops512:rcall nops256
-nops256:rcall nops128
-nops128:rcall nops64
-nops64: rcall nops32
-nops32: rcall nops16
-nops16: rcall nops8
-nops8:  rcall nops4
-nops4:  rcall nops2
-nops2:  rcall nops1
-nops1:  nop
-        ret
-

@@ -2,6 +2,10 @@
 DEVICE = atmega328
 CLOCK = 8000000
 
+HIGH_FUSE = 0xdE
+LOW_FUSE = 0xde
+EXT_FUSE = 0x05
+
 # PROGRAMMER = -c avrisp2 -P /dev/tty.usbmodem00065771
 PROGRAMMER = -c usbasp -P usb
 # ******************************************************************************
@@ -17,6 +21,9 @@ build:
 asm:
 	avra -fI main.asm
 	avrdude $(PROGRAMMER) -p $(DEVICE) -U flash:w:main.hex:i
+
+setfuse:
+	avrdude $(PROGRAMMER) -p $(DEVICE) -U hfuse:w:$(HIGH_FUSE):m -U lfuse:w:$(LOW_FUSE):m -U efuse:w:$(EXT_FUSE):m
 
 clean:
 	@rm -f *.cof *.hex *.obj *.elf
