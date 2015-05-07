@@ -90,43 +90,45 @@
 ; .org 0x0100
 
 setup:
+        ; ******* I/O Registers from 0x00-0x1F can be bit accessed with sbi cbi sbis sbic ******
         sbi     DDRD, PORTD6            ; Enable OC0A aka PD6 for output
         sbi     DDRD, PORTD5            ; Enable OC0B aka PD5 for output
+        ; **************************************************************************************
 
-        ; Reset the counter
+        ; ******** I/O Registers from 0x00-0x3f can be read/write directly with in / out *******
         ldi     temp, 0
-        out     TCNT0, temp
+        out     TCNT0, temp             ; Reset the counter
 
-        ; Set OCR for dutycycle
         ldi     temp, TOP
-        out     OCR0A, temp             ; TOP=OCR0A in WGMode 13
+        out     OCR0A, temp             ; TOP=OCR0A in WGMode 7
         ldi     temp, dutycycle
-        out     OCR0B, temp
+        out     OCR0B, temp             ; Set OCR0B for dutycycle
 
-        ; Set the Timer/Counter Control Register for WaveGuideMode, Clock Select & Compare settings
-        ldi     temp, ( (COMA & 2)>>1 ) << COM0A1
+        ; NOTE - This is heavy handed, but means I can simply choose all settings in the header
+        ldi     temp, ( (COMA & 2)>>1 ) << COM0A1       ; Compare Output Mode A (eg inverted / non-inverted)
         ori     temp, ( (COMA & 1)    ) << COM0A0
-        ori     temp, ( (COMB & 2)>>1 ) << COM0B1
+        ori     temp, ( (COMB & 2)>>1 ) << COM0B1       ; Compare Output Mode B
         ori     temp, ( (COMB & 1)    ) << COM0B0
-        ori     temp, ( (WGM  & 2)>>1 ) << WGM01
+        ori     temp, ( (WGM  & 2)>>1 ) << WGM01        ; Waveform Generation Mode (eg PWM, CTC, Phase correction)
         ori     temp, ( (WGM  & 1)    ) << WGM00
         out     TCCR0A, temp
         ldi     temp, ( (WGM  & 4)>>2 ) << WGM02
-        ori     temp, ( (CS   & 4)>>2 ) << CS02
+        ori     temp, ( (CS   & 4)>>2 ) << CS02         ; Clock Select (prescaler)
         ori     temp, ( (CS   & 2)>>1 ) << CS01
         ori     temp, ( (CS   & 1)    ) << CS00
         out     TCCR0B, temp
+        ; **************************************************************************************
 
-        ; Enable interupts for OCRA / OCRB and Timer overflow
+        ; ******** I/O Registers beyond 0x00-0x3f must accessed as SRAM mapped to 0x60- ********
         ldi     temp, (ISR_output_B << OCIE0B) + (ISR_output_A << OCIE0A) + (ISR_OverFlow << TOIE0)
         ldi     ZH, HIGH(TIMSK0)
         ldi     ZL, LOW(TIMSK0)
-        st      Z, temp
+        st      Z, temp                 ; Enable interupts for OCRA / OCRB and Timer overflow
+        ; **************************************************************************************
 
-        ; Finally enable global interrupts
-        sei
 
-        ; ******** END OF SETUP **********
+        sei                             ; Finally enable global interrupts
+
 
 loopForever:
         rjmp    loopForever
