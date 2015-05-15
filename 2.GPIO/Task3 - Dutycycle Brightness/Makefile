@@ -1,13 +1,16 @@
 # **************************** Select Task Solution ****************************
-ASM_TARGET = main.asm
+# ASM_TARGET = main.asm
+ASM_TARGET = main_32u4.asm
 C_TARGET = main.c
 
 C_CLOCK = 8000000
 # ******************************************************************************
 
 # **************************** Device & Programmer ****************************
-DEVICE = atmega328
-PROGRAMMER = -c usbasp -P usb
+DEVICE = atmega328p
+DEVICE = atmega32u4
+# PROGRAMMER = -c usbasp -P usb
+PROGRAMMER = -c avrisp2 -P /dev/tty.usbmodem00065771
 # ******************************************************************************
 
 # ****************************** Short cut macros ******************************

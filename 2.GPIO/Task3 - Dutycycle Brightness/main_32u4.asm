@@ -1,4 +1,4 @@
-.DEVICE ATmega328p                      ; Using LEDs on PB7 or PD5
+; .DEVICE ATmega32u4                      ; Using LED on PC7
 
 .def    temp            = r16
 .def    counter         = r17           ; Use .def to label a register
@@ -6,9 +6,12 @@
 .def    direction       = r20
 
 .equ    DDRB    = 0x04                  ; Use .equ to label a value
+.equ    DDRC    = 0x07
 .equ    PORTB   = 0x05
+.equ    PORTC   = 0x08
 .equ    PINB5   = 5
 .equ    PINB7   = 7
+.equ    PINC7   = 7
 .equ    period  = 0xff
 .equ    FullOFF = 0x00
 .equ    UP      = 0x01
@@ -21,7 +24,7 @@
 .org 0x0100
 
 setup:
-        sbi     DDRB, PINB5
+        sbi     DDRC, PINC7
 
         ldi     dutyCycle, FullOFF      ; Full off
         ldi     direction, UP           ; going up
@@ -41,7 +44,7 @@ waitON:
         sub     counter, dutyCycle
         inc     counter                 ; Delay range from 1->256
 waitOFF:
-        rcall   nops256
+        rcall   nops8
         dec     counter
         brne    waitOFF
 
@@ -65,10 +68,10 @@ continuePulse:
         rjmp    mainLoop
 
 LEDon:
-        sbi     PORTB,PINB5
+        sbi     PORTC,PINC7
         ret
 LEDoff:
-        cbi     PORTB,PINB5
+        cbi     PORTC,PINC7
         ret
 
 

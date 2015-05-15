@@ -1,12 +1,14 @@
 # **************************** Select Task Solution ****************************
 ASM_TARGET = main_328p.asm
-# C_TARGET = main.c
-C_TARGET = bonus_328p.c
+C_TARGET = main_32u4.c
+# C_TARGET = bonus_328p.c
 # ******************************************************************************
 
 # **************************** Device & Programmer ****************************
-DEVICE = atmega328
-PROGRAMMER = -c usbasp -P usb
+DEVICE = atmega328p
+DEVICE = atmega32u4
+# PROGRAMMER = -c usbasp -P usb
+PROGRAMMER = -c avrisp2 -P /dev/tty.usbmodem00065771
 # ******************************************************************************
 
 # ****************************** Short cut macros ******************************
