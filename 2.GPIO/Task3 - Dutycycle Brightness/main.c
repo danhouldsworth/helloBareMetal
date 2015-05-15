@@ -9,7 +9,7 @@ int main(void) {
     PORTB |=  (1 << PORTB5);
 
     double duty_ON = 1.0;
-    double period = 20.0;
+    double period = 10.0;
     double delta = 1.0;
 
     for (;;duty_ON += delta){
