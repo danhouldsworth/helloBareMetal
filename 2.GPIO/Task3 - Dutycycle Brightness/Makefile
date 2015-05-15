@@ -8,7 +8,7 @@ C_CLOCK = 8000000
 
 # **************************** Device & Programmer ****************************
 DEVICE = atmega328p
-DEVICE = atmega32u4
+# DEVICE = atmega32u4
 # PROGRAMMER = -c usbasp -P usb
 PROGRAMMER = -c avrisp2 -P /dev/tty.usbmodem00065771
 # ******************************************************************************
