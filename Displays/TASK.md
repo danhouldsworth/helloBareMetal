@@ -7,7 +7,8 @@ TASK
 
 Bonus : Extend the above to drive the 1.8" TFT display.
 
-Suggested Approach
+Suggested Approach -
+
 Hide the details of the particular display from the applications by writing to bitmapped canvas in memory which is then copied wholesale to the display.
 - Allows the update and refresh of the display to be a scheduled task at say 20 Hz which is sufficent for dynamic displays (eg scrolling text in 1 pixel increments; animated icons etc)
 - requires the minimum of low level driver functions for any given display ( init, clear, fill from memory)
