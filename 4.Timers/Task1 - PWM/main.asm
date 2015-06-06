@@ -10,7 +10,7 @@
 
 ; Now, switch to WGMode 7, and set TOP = 76
 
-.include "m328Pdef.inc"
+.include "../../Reference/Libs/defSheets/m328Pdef.inc"
 
 .def    temp            = r16
 
@@ -26,8 +26,8 @@
 
 ; ***************************** Output Compare - Channel A *****************************
 ;
-.equ    COMA = 0   ;          Normal Pin. OCA disconnected
-; .equ    COMA = 1   ;          Toggle OC0A on Compare Match
+; .equ    COMA = 0   ;          Normal Pin. OCA disconnected
+.equ    COMA = 1   ;          Toggle OC0A on Compare Match
 ; .equ    COMA = 2   ;          Clear OC0A on Compare Match. "Non-inverted PWM"
 ; .equ    COMA = 3   ;          Set OC0A on Compare Match "Inverted PWM"
 ;
@@ -35,10 +35,10 @@
 
 ; ***************************** Output Compare - Channel B *****************************
 ;
-; .equ    COMB = 0   ; Normal Pin. OCA disconnected
-; .equ    COMB = 1   ; Toggle OC0A on Compare Match
-.equ    COMB = 2   ; Clear OC0A on Compare Match. "Non-inverted PWM"
-; .equ    COMB = 3   ; Set OC0A on Compare Match "Inverted PWM"
+; .equ    COMB = 0   ; Normal Pin. OCB disconnected
+; .equ    COMB = 1   ; Toggle OC0B on Compare Match
+.equ    COMB = 2   ; Clear OC0B on Compare Match. "Non-inverted PWM"
+; .equ    COMB = 3   ; Set OC0B on Compare Match "Inverted PWM"
 ;
 ; **************************************************************************************
 

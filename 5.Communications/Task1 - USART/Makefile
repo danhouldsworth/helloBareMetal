@@ -1,14 +1,16 @@
 # **************************** Select Task Solution ****************************
 ASM_TARGET = main.asm
-C_TARGET = main2.c
+# C_TARGET = main.c
+# C_TARGET = main2.c
+C_TARGET = bonus.c
 
 CLOCK = 16000000
 # ******************************************************************************
 
 # **************************** Device & Programmer ****************************
-DEVICE = atmega328p
-# PROGRAMMER = -c usbasp -P usb
-PROGRAMMER = -c avrisp2 -P /dev/tty.usbmodem00065771
+DEVICE = atmega328
+PROGRAMMER = -c usbasp -P usb
+# PROGRAMMER = -c avrisp2 -P /dev/tty.usbmodem00065771
 # ******************************************************************************
 
 # ****************************** Short cut macros ******************************

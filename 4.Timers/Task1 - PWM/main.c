@@ -11,7 +11,7 @@ void setup(){
     DDRD |= (1 << PORTD5) | (1 << PORTD6);
 
     // Set Compare Output Mode A/B
-    TCCR0A |= (0 << COM0A1) | (0 << COM0A0) | (1 << COM0B1) | (0 << COM0B0);
+    TCCR0A |= (1 << COM0A1) | (1 << COM0A0) | (1 << COM0B1) | (0 << COM0B0);
 
     // Set Wave Guide Mode
     TCCR0B |= (1 << WGM02); TCCR0A |= (1 << WGM01) | (1 << WGM00);

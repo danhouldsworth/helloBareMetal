@@ -30,7 +30,7 @@ void initUSART0(){
     // -- Enable the PINs for Rx and Tx
     UCSR0B |=   (1 << RXEN0) | (1 << TXEN0);
     // -- and the interrupts
-    UCSR0B |=   (1 << RXCIE0);//| (0 << TXCIE0) | (0 << UDRIE0);
+    UCSR0B |=   (1 << RXCIE0) | (0 << TXCIE0) | (0 << UDRIE0);
     // --
     sei();
 
