@@ -6,9 +6,9 @@ CLOCK = 8000000
 # ******************************************************************************
 
 # **************************** Device & Programmer ****************************
-DEVICE = atmega328
-PROGRAMMER = -c usbasp -P usb
-# PROGRAMMER = -c avrisp2 -P /dev/tty.usbmodem00065771
+DEVICE = atmega328p
+# PROGRAMMER = -c usbasp -P usb
+PROGRAMMER = -c avrisp2 -P /dev/tty.usbmodem00065771
 # ******************************************************************************
 
 # ****************************** Short cut macros ******************************
