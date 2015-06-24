@@ -1,7 +1,4 @@
 # **************************** Select Task Solution ****************************
-ASM_TARGET = main.asm
-# C_TARGET = main.c
-# C_TARGET = main2.c
 C_TARGET = bonus.c
 
 CLOCK = 16000000
@@ -9,8 +6,9 @@ CLOCK = 16000000
 
 # **************************** Device & Programmer ****************************
 DEVICE = atmega328
+DEVICE = atmega328p
 PROGRAMMER = -c usbasp -P usb
-# PROGRAMMER = -c avrisp2 -P /dev/tty.usbmodem00065771
+PROGRAMMER = -c avrisp2 -P /dev/tty.usbmodem00065771
 # ******************************************************************************
 
 # ****************************** Short cut macros ******************************
@@ -30,13 +28,6 @@ build:
 	@avr-size --format=avr --mcu=$(DEVICE) main.hex
 
 	# Flash C .hex to chip
-	$(AVRDUDE)
-
-asm:
-	# Compiling ASM with avra directly to .hex
-	avra -DF_CPU=$(CLOCK) --includepath ../../Reference/Libs -fI $(ASM_TARGET) -o main.hex
-
-	# Flash ASM .hex to chip
 	$(AVRDUDE)
 
 clean:
