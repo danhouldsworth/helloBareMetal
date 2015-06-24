@@ -1,5 +1,6 @@
 # **************************** Select Task Solution ****************************
 C_TARGET = bonus.c
+C_TARGET = ESCproject.c
 
 CLOCK = 16000000
 # ******************************************************************************
@@ -27,7 +28,7 @@ build:
 	# Information about the flash.hex
 	@avr-size --format=avr --mcu=$(DEVICE) main.hex
 
-	# Flash C .hex to chip
+	# Flash C $(C_TARGET).hex to chip
 	$(AVRDUDE)
 
 clean:

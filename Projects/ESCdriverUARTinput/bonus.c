@@ -8,8 +8,8 @@
             : so despite simpleSimonK set to 1100-1900 they seem to drift to 1070-1870
 */
 
-#include <avr/interrupt.h>
-#include <stdio.h>
+#include <avr/interrupt.h>  // ISR(), sei, cli, <avr/io.h> for port defs etc
+#include <stdio.h>          // sprintf() and standard types
 
 // -- Choose my UART BAUD rate
 #define USART_BAUDRATE 115200
@@ -32,8 +32,9 @@ uint8_t USART0SendByte(uint8_t u8Data);
 // --
 
 // -- Globals (on the stack)
-uint16_t duty = 1000;                                                   // 1000us ON / 1500us OFF
-uint8_t sendQueue[1000], *buffPtr = sendQueue, *sendPtr = sendQueue;    // 1000char max string
+uint16_t duty = 1000;                                                               // 1000us ON / 1500us OFF
+uint8_t ringBufferSend[1000], *writePtr = ringBufferSend, *sendPtr = ringBufferSend; // 1000char max string
+uint8_t ringBufferRecv[1000], *readPtr  = ringBufferRecv, *rcvdPtr = ringBufferRecv; // 1000char max string
 uint16_t stepSize = 10, MAX_PWM = 2000, MIN_PWM = 1000;
 // --
 
@@ -64,7 +65,7 @@ void USART0SendString(char *ptr){
     while (USART0SendByte(*ptr++)); // We're okay : string from displayDuty/Step stack is copied by value to buffer
 }
 uint8_t USART0SendByte(uint8_t u8Data){
-    *(buffPtr++) = u8Data;
+    *(writePtr++) = u8Data;
     UCSR0B |= (1 << UDRIE0);                    // Set the UDRIE as we have a queue to send
     return u8Data;                              // Useful for USART0SendString() to terminate strings
 }
@@ -129,16 +130,16 @@ ISR(USART_TX_vect){}
 
 // -- USART_UDRE_vect fires whenever the UDR is empty (and will continue to do so unless we clear UDRIE)
 ISR(USART_UDRE_vect){
-    if (sendPtr < buffPtr) UDR0 = *sendPtr++;   // Send the next byte in our send buffer
+    if (sendPtr < writePtr) UDR0 = *sendPtr++;   // Send the next byte in our send buffer
 
-    if (sendPtr == buffPtr){                    // After sending the last byte (or if the UDRIE fires when nothing queud)
-        sendPtr = buffPtr = sendQueue;          // reset the read/write heads to start of buffer
+    if (sendPtr == writePtr){                    // After sending the last byte (or if the UDRIE fires when nothing queud)
+        sendPtr = writePtr = ringBufferSend;          // reset the read/write heads to start of buffer
         UCSR0B &= ~(1 << UDRIE0);               // and clear the UDRIE from firing again (until we next write)
     }
     /* Issues with above approach :
     + Simple to understand, implement and debug
     + Easy to just increase buffer size if we need bigger / slower messages
-    - If sendPtr is always lagging buffPtr (ie when sending a continuous stream),
+    - If sendPtr is always lagging writePtr (ie when sending a continuous stream),
     its easy to see that we could quickly consume the buffer and stack overflow.
 
     Alternative approach would be to use a ring buffer :
