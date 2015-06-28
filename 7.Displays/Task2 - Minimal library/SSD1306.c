@@ -69,21 +69,22 @@ void RSTport(uint8_t state);
 // the memory buffer for the LCD
 static uint8_t buffer[SSD1306_LCDHEIGHT * SSD1306_LCDWIDTH / 8];
 
-#define PARTICLES 50
+#define PARTICLES 15
 
 float x[PARTICLES];
 float y[PARTICLES];
 float vx[PARTICLES];
 float vy[PARTICLES];
-float ax = 0.0;
+float ax = 0.000;
 float ay = 0.5;
 
 int main(void){
 
         for (int i =0; i<PARTICLES;i++){
-                x[i] = 64; y[i] = 32;
-                vx[i] = 1.5*sin((float)i * 2* M_PI/(float)PARTICLES);
-                vy[i] = 1.5*cos((float)i * 2* M_PI/(float)PARTICLES) - 2.5;
+                x[i] = 64 + 5*sin((float)i * 2* M_PI/(float)PARTICLES);
+                y[i] = 32 + 5*cos((float)i * 2* M_PI/(float)PARTICLES);
+                vx[i] = 0;//0.1*sin((float)i * 2* M_PI/(float)PARTICLES);
+                vy[i] = 0;//0.1*cos((float)i * 2* M_PI/(float)PARTICLES) - 2.5;
         }
 
         initUSART0();
@@ -100,7 +101,17 @@ int main(void){
                         y[p] += vy[p];
                         vx[p] += ax;
                         vy[p] += ay;
-                        if (x[p]>126){vx[p] *= -0.8; x[p] = 126;}
+
+                        for (uint8_t q = 0; q<PARTICLES; q++){
+                            if (p == q) continue;
+                            int8_t dx = x[q] - x[p];
+                            int8_t dy = y[q] - y[p];
+                            float sep = dx*dx+dy*dy;
+                            if (dx) vx[q] += dx / sep;
+                            if (dy) vy[q] += dy / sep;
+                        }
+
+                        if (x[p]>125){vx[p] *= -0.8; x[p] = 125;}
                         if (y[p]>61) {vy[p] *= -0.8; y[p] =  61;}
                         if (x[p]<1)  {vx[p] *= -0.8; x[p] =   1;}
                         if (y[p]<1)  {vy[p] *= -0.8; y[p] =   1;}
