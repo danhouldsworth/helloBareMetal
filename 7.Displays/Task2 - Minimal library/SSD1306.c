@@ -1,7 +1,6 @@
 #include <avr/interrupt.h>
-#include <avr/pgmspace.h>
-#include <stdlib.h>
-#include <stdio.h>
+// #include <avr/pgmspace.h>
+// #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include "DanUSARTv2.h"
@@ -79,13 +78,12 @@ float vy[PARTICLES];
 float ax = 0.0;
 float ay = 0.5;
 
-
 int main(void){
 
         for (int i =0; i<PARTICLES;i++){
                 x[i] = 64; y[i] = 32;
-                vx[i] = sin((float)i * 2* M_PI/(float)PARTICLES);
-                vy[i] = cos((float)i * 2* M_PI/(float)PARTICLES);
+                vx[i] = 1.5*sin((float)i * 2* M_PI/(float)PARTICLES);
+                vy[i] = 1.5*cos((float)i * 2* M_PI/(float)PARTICLES) - 2.5;
         }
 
         initUSART0();
@@ -102,16 +100,27 @@ int main(void){
                         y[p] += vy[p];
                         vx[p] += ax;
                         vy[p] += ay;
-                        if (x[p]>128) {vx[p] *= -0.9; x[p] = 128;}
-                        if (y[p]>64) {vy[p] *= -0.9; y[p] = 64;}
-                        if (x[p]<1) {vx[p] *= -0.9; x[p] = 1;}
-                        if (y[p]<1) {vy[p] *= -0.9; y[p] = 1;}
+                        if (x[p]>126){vx[p] *= -0.8; x[p] = 126;}
+                        if (y[p]>61) {vy[p] *= -0.8; y[p] =  61;}
+                        if (x[p]<1)  {vx[p] *= -0.8; x[p] =   1;}
+                        if (y[p]<1)  {vy[p] *= -0.8; y[p] =   1;}
 
-                        for (uint8_t i =0; i<1; i++){
-                                for (uint8_t j=0; j<1; j++){
-                                SSD1306_drawPixel((uint8_t)x[p]+i-1, (uint8_t)y[p]+j-1, WHITE);
-                                }
-                        }
+                        SSD1306_drawPixel((uint8_t)x[p]-1, (uint8_t)y[p]-1, 0);
+                        SSD1306_drawPixel((uint8_t)x[p]+0, (uint8_t)y[p]-1, 1);
+                        SSD1306_drawPixel((uint8_t)x[p]+1, (uint8_t)y[p]-1, 1);
+                        SSD1306_drawPixel((uint8_t)x[p]+2, (uint8_t)y[p]-1, 0);
+                        SSD1306_drawPixel((uint8_t)x[p]-1, (uint8_t)y[p]-0, 1);
+                        SSD1306_drawPixel((uint8_t)x[p]+0, (uint8_t)y[p]-0, 1);
+                        SSD1306_drawPixel((uint8_t)x[p]+1, (uint8_t)y[p]-0, 1);
+                        SSD1306_drawPixel((uint8_t)x[p]+2, (uint8_t)y[p]-0, 1);
+                        SSD1306_drawPixel((uint8_t)x[p]-1, (uint8_t)y[p]+1, 1);
+                        SSD1306_drawPixel((uint8_t)x[p]+0, (uint8_t)y[p]+1, 1);
+                        SSD1306_drawPixel((uint8_t)x[p]+1, (uint8_t)y[p]+1, 1);
+                        SSD1306_drawPixel((uint8_t)x[p]+2, (uint8_t)y[p]+1, 1);
+                        SSD1306_drawPixel((uint8_t)x[p]-1, (uint8_t)y[p]+2, 0);
+                        SSD1306_drawPixel((uint8_t)x[p]+0, (uint8_t)y[p]+2, 1);
+                        SSD1306_drawPixel((uint8_t)x[p]+1, (uint8_t)y[p]+2, 1);
+                        SSD1306_drawPixel((uint8_t)x[p]+2, (uint8_t)y[p]+2, 0);
 
                 }
                 SSD1306_display();
@@ -122,7 +131,7 @@ int main(void){
 // -- App specific read / output messages & processes
 void readFromRxBuffer(){
 
-        // char maxStr[10];
+        char maxStr[20];
 
         if (rcvdPtr == readPtr) return;
 
@@ -132,12 +141,10 @@ void readFromRxBuffer(){
         switch (u8TempData) {
         case '\r':
         case '\n':
-                // sprintf(maxStr, "x = %d\r\n", x); USART0SendString(maxStr);
-                // sprintf(maxStr, "y = %d\r\n", y); USART0SendString(maxStr);
-                // sprintf(maxStr, "vx = %d\r\n", vx); USART0SendString(maxStr);
-                // sprintf(maxStr, "vy = %d\r\n", vy); USART0SendString(maxStr);
-        	USART0SendString("\r\n");
-        	break;
+                systemTicks++;
+                // maxStr[0]++;
+                sprintf(maxStr, "sysTicks = %d\r\n", 0); USART0SendString(maxStr);
+            	break;
         }
 }
 // --
@@ -186,9 +193,9 @@ void SSD1306_drawPixel(uint8_t x, uint8_t y, uint8_t color) {
 }
 
 void SSD1306_begin(){
-        RSTport(ON);
-        // RSTport(OFF);
-        RSTport(ON);
+    RSTport(ON);    //waitTicks(5);
+    RSTport(OFF);   //waitTicks(5);
+    RSTport(ON);
 	SSD1306_command(SSD1306_DISPLAYOFF);
 	SSD1306_command(SSD1306_SETDISPLAYCLOCKDIV);   SSD1306_command(0x80);
 	SSD1306_command(SSD1306_SETMULTIPLEX);         SSD1306_command(0x3F);

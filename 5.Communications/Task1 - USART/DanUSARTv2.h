@@ -15,7 +15,7 @@
 // Calc UBBR = ((F_CPU / (USART_BAUDRATE * 16UL))) - 1
 // However, needs to be an int, and don't want risk of truncation down so easier to set manually (for higher BAUDs)
 #define UBRR_VALUE 8
-#define RING_BUFF_SIZE 2
+#define RING_BUFF_SIZE 10
 // --
 
 
@@ -29,7 +29,7 @@ void readFromRxBuffer();
 // -- Globals (on the stack)
 uint8_t ringBufferSend[RING_BUFF_SIZE], *writePtr = ringBufferSend, *sendPtr = ringBufferSend;
 uint8_t ringBufferRecv[RING_BUFF_SIZE], *readPtr  = ringBufferRecv, *rcvdPtr = ringBufferRecv;
-uint8_t systemTicks = 0; // Depending on TOP circa 3ms per tick
+volatile uint8_t systemTicks = 0; // Depending on TOP circa 3ms per tick
 // --
 
 // -- Send Byte / String down the UART
@@ -128,4 +128,10 @@ ISR(TIMER0_OVF_vect){
         systemTicks++;
     }
 }
-// --
+void waitTicks(uint16_t ticks){
+    uint16_t oldTicks = systemTicks;
+    while (systemTicks < oldTicks + ticks){
+        // while (oldTicks == systemTicks); // Want to avoid issues of comparison at roll over
+        // oldTicks = systemTicks;
+    }
+}
