@@ -15,7 +15,7 @@
 // Calc UBBR = ((F_CPU / (USART_BAUDRATE * 16UL))) - 1
 // However, needs to be an int, and don't want risk of truncation down so easier to set manually (for higher BAUDs)
 #define UBRR_VALUE 8
-#define RING_BUFF_SIZE 200
+#define RING_BUFF_SIZE 2
 // --
 
 
@@ -29,33 +29,7 @@ void readFromRxBuffer();
 // -- Globals (on the stack)
 uint8_t ringBufferSend[RING_BUFF_SIZE], *writePtr = ringBufferSend, *sendPtr = ringBufferSend;
 uint8_t ringBufferRecv[RING_BUFF_SIZE], *readPtr  = ringBufferRecv, *rcvdPtr = ringBufferRecv;
-// --
-
-// int main(void) {
-
-//     initUSART0();
-
-//     for (;;) {}
-//     return 0;       // Remember this must never be reached in baremetal without an OS
-// }
-
-// -- App specific read / output messages & processes
-// void readFromRxBuffer(){
-
-//     if (rcvdPtr == readPtr) return;
-
-//     uint8_t u8TempData = *readPtr++;
-//     if (readPtr > (ringBufferRecv + RING_BUFF_SIZE)) readPtr = ringBufferRecv;  // Wrap the readPtr round the ring
-
-//     switch (u8TempData) {
-//         case '\r':
-//         case '\n':
-//             USART0SendString("\r\n");
-//             break;
-//         default:
-//             USART0QueueByte(u8TempData);
-//     }
-// }
+uint8_t systemTicks = 0; // Depending on TOP circa 3ms per tick
 // --
 
 // -- Send Byte / String down the UART
@@ -104,8 +78,8 @@ void initPWM(uint8_t TOP){ // Also used for the system timer!!
     // Set Wave Guide Mode
     TCCR0B |= (1 << WGM02); TCCR0A |= (1 << WGM01) | (1 << WGM00);
 
-    // Set Clock Select
-    TCCR0B |= (1 << CS02) | (0 << CS01) | (0 << CS00);
+    // Set Clock Select (100 = 1/256) (101 = 1/1024)
+    TCCR0B |= (1 << CS02) | (0 << CS01) | (1 << CS00);
 
     // Enable/Disable interupts OCA/OCB/Overflow
     TIMSK0 |= (0 << OCIE0B) + (0 << OCIE0A) + (1 << TOIE0);
@@ -151,6 +125,7 @@ ISR(TIMER0_OVF_vect){
     if (counter++ == 40) {      // Circa 10Hz
         readFromRxBuffer();
         counter = 0;
+        systemTicks++;
     }
 }
 // --
