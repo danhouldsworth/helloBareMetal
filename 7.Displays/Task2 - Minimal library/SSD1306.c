@@ -88,7 +88,7 @@ int main(void){
         }
 
         initUSART0();
-        initPWM(255);
+        initPWM(80);
         initHW_SPI();
         SSD1306_begin();
         memset(buffer,0,sizeof(buffer));
@@ -204,8 +204,8 @@ void SSD1306_drawPixel(uint8_t x, uint8_t y, uint8_t color) {
 }
 
 void SSD1306_begin(){
-    RSTport(ON);    //waitTicks(5);
-    RSTport(OFF);   //waitTicks(5);
+    RSTport(ON);    waitTicks(1);
+    RSTport(OFF);   waitTicks(1);
     RSTport(ON);
 	SSD1306_command(SSD1306_DISPLAYOFF);
 	SSD1306_command(SSD1306_SETDISPLAYCLOCKDIV);   SSD1306_command(0x80);
