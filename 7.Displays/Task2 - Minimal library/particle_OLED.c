@@ -1,6 +1,4 @@
 #include <avr/interrupt.h>
-// #include <avr/pgmspace.h>
-// #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include "DanUSARTv2.h"
@@ -81,8 +79,8 @@ float ay = 0.5;
 int main(void){
 
         for (int i =0; i<PARTICLES;i++){
-                x[i] = 64 + 5*sin((float)i * 2* M_PI/(float)PARTICLES);
-                y[i] = 32 + 5*cos((float)i * 2* M_PI/(float)PARTICLES);
+                x[i] = 64 + 3*sin((float)i * 2* M_PI/(float)PARTICLES);
+                y[i] = 32 + 3*cos((float)i * 2* M_PI/(float)PARTICLES);
                 vx[i] = 0;//0.1*sin((float)i * 2* M_PI/(float)PARTICLES);
                 vy[i] = 0;//0.1*cos((float)i * 2* M_PI/(float)PARTICLES) - 2.5;
         }
@@ -92,6 +90,8 @@ int main(void){
         initHW_SPI();
         SSD1306_begin();
         memset(buffer,0,sizeof(buffer));
+        SSD1306_display();
+        waitTicks(5);
 
         uint8_t p = 0;
         for(;;) {

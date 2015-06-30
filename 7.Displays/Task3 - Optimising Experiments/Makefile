@@ -1,5 +1,6 @@
 # **************************** Select Task Solution ****************************
-C_TARGET = particle_OLED.c
+C_TARGET = fast850HzOLED.c
+# C_TARGET = scroll.c
 CLOCK = 16000000
 # ******************************************************************************
 
@@ -12,22 +13,14 @@ PROGRAMMER = -c avrisp2 -P /dev/tty.usbmodem00065771
 AVRDUDE = avrdude $(PROGRAMMER) -p $(DEVICE) -U flash:w:main.hex:i
 # ******************************************************************************
 
-# INCLUDES += OLED.c
-# INCLUDES += SSD1306.h
-
-COMMON_FLAGS += -g -Os -Wall -funsigned-char
-# COMMON_FLAGS += -mno-short-calls -nodefaultlibs -lm -lgcc -lc -lgcc
-# COMMON_FLAGS += -ffunction-sections -fdata-sections
-# COMMON_FLAGS += -Wl,--gc-sections
-# COMMON_FLAGS += -Wl,--relax -mcall-prologues
-CFLAGS = $(COMMON_FLAGS) -std=gnu99
+CFLAGS = -Os -Wall -std=gnu99
 
 all: build
 
 build:
-	# Compiling C with avr-gcc to main.elf
-	# @avr-gcc $(CFLAGS) -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) $(INCLUDES) $(C_TARGET) -o main.elf
-	@avr-gcc -lc -lm $(CFLAGS) -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) $(INCLUDES) $(C_TARGET) -o main.elf -lc
+	# Compiling $(C_TARGET) with avr-gcc to main.elf
+	@avr-gcc $(CFLAGS) -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) $(INCLUDES) -S $(C_TARGET)
+	@avr-gcc $(CFLAGS) -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) $(INCLUDES) $(C_TARGET) -o main.elf
 
 	# Converting to .hex
 	@avr-objcopy -O ihex main.elf main.hex
