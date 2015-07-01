@@ -22,8 +22,8 @@ int main(void){
     PORTB &= ~(1 << PORTB2);
 
     for(uint16_t frame = 0;;frame++)
-        for (uint8_t col = 0; col < 8; col++)
-            for (uint8_t x = 0; x<128; x++)
+        for (uint8_t col = 8; col > 0; col--)
+            for (uint8_t x = 128; x > 0; x--)
                 SPDR = (( (( ( x+(frame>>col) )&8 )>>3) + (col&1) )&1 )*255; // Multi speed lines
 }
 

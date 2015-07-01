@@ -13,7 +13,7 @@ PROGRAMMER = -c avrisp2 -P /dev/tty.usbmodem00065771
 AVRDUDE = avrdude $(PROGRAMMER) -p $(DEVICE) -U flash:w:main.hex:i
 # ******************************************************************************
 
-CFLAGS = -Os -Wall -std=gnu99
+CFLAGS = -O0 -Wall -std=gnu99
 
 all: build
 
