@@ -1,0 +1,51 @@
+<html><head></head><body></body><script type="text/javascript">
+var photoDrop = document.createElement('canvas'),
+    ctx       = photoDrop.getContext('2d'),
+    w = photoDrop.width = 5*128,
+    h = photoDrop.height= 5*64,
+    bitmap = [w*h/8];
+window.document.body.appendChild(photoDrop);
+window.addEventListener('paste', function(event){
+    var offset = function(x,y) {return (y * photoDrop.width + x) * 4;}
+    var item = event.clipboardData.items[0];    console.log("Got pasted item: " + item.type);
+    var file = item.getAsFile();
+    var reader = new FileReader();
+    reader.onload = function () {
+        var importedImage = new Image();
+        var mono;
+        importedImage.onload = function() {
+            ctx.drawImage(importedImage, 0, 0, w, h);
+            var imagedata = ctx.getImageData(0, 0, w, h);
+            var THRESHOLD = 355;
+            for (x = 0; x < w; x++){
+                for (y = 0; y < h; y++){
+                    mono =  imagedata.data[offset(x,y) + 0] +
+                            imagedata.data[offset(x,y) + 1] +
+                            imagedata.data[offset(x,y) + 2] + 0
+                            // imagedata.data[offset(x,y) + 3];
+                    imagedata.data[offset(x,y)+0] = imagedata.data[offset(x,y)+1] = imagedata.data[offset(x,y)+2] = (mono > THRESHOLD) ? 255 : 0;
+                    imagedata.data[offset(x,y) + 3] = 255;
+                }
+            }
+            ctx.putImageData(imagedata,0,0);
+            for (x = 0; x < w; x++){
+                for (col = 0; col < h / 8; col++){
+                    bitmap[x + col*w] = 0;
+                    for (y = 0; y < 8; y++){
+                        bitmap[x + col*w] += (imagedata.data[offset(x,col * 8 + y)]/255) << y;
+                    }
+                }
+            }
+            var file = window.document.createElement('p');
+            file.innerHTML = "" +
+                "Width = "  + w + "<br/>" +
+                "Height = " + h + "<br/>" +
+                "bitmap = " + bitmap.length + "<br/>" +
+                JSON.stringify(bitmap);
+            window.document.body.appendChild(file);
+        }
+        importedImage.src = reader.result;
+    };
+    reader.readAsDataURL( file );
+}, false);
+</script></html>

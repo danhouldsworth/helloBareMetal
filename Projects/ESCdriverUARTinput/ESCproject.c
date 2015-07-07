@@ -27,6 +27,7 @@ void displayStep();
 // -- Globals (on the stack)
 uint16_t duty = 1000;   // 1000us ON / 1500us OFF
 uint16_t stepSize = 10, MAX_PWM = 2000, MIN_PWM = 1000;
+uint8_t RUNNING_AUTOMATED_TEST = 0;
 // --
 
 int main(void) {
@@ -41,6 +42,23 @@ int main(void) {
 // -- App specific read / output messages & processes
 void readFromRxBuffer(){
 
+    if (RUNNING_AUTOMATED_TEST){
+        switch (systemTicks){
+            case 1000: duty = 1150; displayDuty(); break;
+            case 4000: duty = 1550; displayDuty(); break;
+            case 5000: duty = 1750; displayDuty(); break;
+            case 6000: duty = 1950; displayDuty(); break;
+            case 7000: duty = 1750; displayDuty(); break;
+            case 8000: duty = 1550; displayDuty(); break;
+            case 9000:
+                duty =  500;
+                displayDuty();
+                USART0SendString("FINISHED & DISARMED\r\n");
+                RUNNING_AUTOMATED_TEST = 0;
+                break;
+        }
+
+    }
     if (rcvdPtr == readPtr) return;
 
     uint8_t u8TempData = *readPtr++;
@@ -48,8 +66,11 @@ void readFromRxBuffer(){
 
     switch (u8TempData) {
         case ' ':
+            duty =  500;
             displayDuty();
             displayStep();
+            USART0SendString("FINISHED & DISARMED\r\n");
+            RUNNING_AUTOMATED_TEST = 0;
             break;
         case '\r':
         case '\n':
@@ -76,15 +97,10 @@ void readFromRxBuffer(){
             if (duty > MAX_PWM) duty = MAX_PWM;
             displayDuty();
             break;
-        case 'l':
-        case 'L':
-            duty = 950;     // Try a deliberately low or...
-            displayDuty();
-            break;
-        case 'h':
-        case 'H':
-            duty = 2050;    // ...high setting to test the ESC
-            displayDuty();
+        case 'G':
+            systemTicks = 0;
+            RUNNING_AUTOMATED_TEST = 1;
+            USART0SendString("STAND BACK...!\r\n");
             break;
         default:
             USART0QueueByte(u8TempData);
@@ -103,29 +119,3 @@ void displayStep(){
     USART0SendString(maxStr);       // Careful : we're sending a pointer to the stack....
 }
 // --
-
-// -- Initialisation
-// void initPWM(uint8_t top){
-//     // Enable PD5 & 6 for output
-//     DDRD |= (1 << PORTD5) | (1 << PORTD6);
-
-//     // Set Compare Output Mode A/B
-//     TCCR0A |= (0 << COM0A1) | (0 << COM0A0) | (1 << COM0B1) | (0 << COM0B0);
-
-//     // Set Wave Guide Mode
-//     TCCR0B |= (1 << WGM02); TCCR0A |= (1 << WGM01) | (1 << WGM00);
-
-//     // Set Clock Select
-//     TCCR0B |= (1 << CS02) | (0 << CS01) | (0 << CS00);
-
-//     // Enable/Disable interupts OCA/OCB/Overflow
-//     TIMSK0 |= (0 << OCIE0B) + (0 << OCIE0A) + (1 << TOIE0);
-
-//     // top set by OCRA
-//     OCR0A = top;
-//     OCR0B = (uint8_t)(top * duty/2500);
-
-//     // Clear the Timer and Go!
-//     TCNT0 = 0;
-//     sei();
-// }

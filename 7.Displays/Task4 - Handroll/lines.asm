@@ -1,7 +1,8 @@
 .include "m328Pdef.inc"
 
 .def    zeroReg = r1
-.def    test    = r16
+.def    test1    = r16
+.def    test2    = r15
 .def    temp    = r17
 .def    temp2   = r18
 .def    xPos    = r19
@@ -84,35 +85,38 @@ animate:
 bitmap:
         ldi colPos, 0x8         ; uint8 colPos = 8
 column:
-        ldi xPos, 128           ; uint8 xPos = 128
-line:
+        clr test1
+        sbrc colPos, 0
+        inc test1                ; B = (col)&1 ? true : false
+
         movw temp16L, frame16L  ; uint16 temp = frame
 
         mov temp2, colPos       ; uint8 temp2 = colPos
 frmLSRcol:
-        lsr temp16L             ; Lose the LSB of 16bit temp
-        bst temp16H, 0         ; ensure bit8 makes it across from tempH to tempL
-        bld temp16L, 7
-        lsr temp16H             ; Finish shift 16bit temp to the right
-
+        lsr temp16H
+        ror temp16L
         dec temp2
         brne frmLSRcol          ; frame >> colPos
+        ; temp16L:H === frame>>colPos
 
-        add temp16L, xPos       ; xPos + frame >> colPos
-        adc temp16H, zeroReg    ; (Careful to add the carry bit...)
-
-        clr test
-
+        ldi xPos, 128           ; uint8 xPos = 128
+line:
+        clr test2
         sbrc temp16L, 3
-        inc test                ; A = (x+frame)&(1<<3) ? true : false
-
-        sbrc colPos, 0
-        inc test                ; B = (col)&1 ? true : false
+        inc test2               ; A = (x+frame>>colPos)&(1<<3) ? true : false
 
         clr cData
-        sbrs test, 0            ; is A ^ B ?
-        ldi cData, 255
+        sbrs test1, 0            ; is A ^ B ?
+        com cData
+        sbrs test2, 0
+        com cData
         out SPDR, cData         ; Assume our calcs are sufficient delay at SPI2X
+        nop
+        nop
+        nop
+        nop
+
+        adiw temp16L, 1         ; temp16L:H = xPos + frame >> colPos
 
         dec xPos
         brne line
@@ -120,6 +124,47 @@ frmLSRcol:
         brne column
 
         adiw frame16L, 1
+        rcall ms_4
+        ; rcall ms_16
         rjmp bitmap
 
         ret
+
+; *************************************** Wait / Delays - Calbirated to 8MHz clock ***************************************
+; "rcall us_1"
+; [=== rcall(3), nop(1) ret(4)] will take 8 ticks before the next instruction (@8MHz ~ 1us)
+; "rcall us_2"
+; [=== rcall(3), rcall(3), nop(1) ret(4) nop(1) ret(4)] =16 ticks (~2us)
+; "rcall us_4"
+; [=== rcall(3) rcall(3) rcall(3) nop(1) ret(4) nop(1) ret(4) rcall(3) nop(1) ret(4) nop(1) ret(4) ] =32tick (~4us)
+;
+; So... rcall fullsecond is ~1s @8MHz clock :-)  [Simply change to 9 nops, so us_1 === 16 ticks for a 16MHz clock]
+; ************************************************************************************************************************
+
+fullsecond:
+ms_1024:rcall ms_512
+ms_512: rcall ms_256
+halfsecond:
+ms_256: rcall ms_128
+ms_128: rcall ms_64
+ms_64:  rcall ms_32
+ms_32:  rcall ms_16
+ms_16:  rcall ms_8
+ms_8:   rcall ms_4
+ms_4:   rcall ms_2
+ms_2:   rcall ms_1
+millisecond:
+ms_1:   rcall us_512
+us_512: rcall us_256
+us_256: rcall us_128
+us_128: rcall us_64
+us_64:  rcall us_32
+us_32:  rcall us_16
+us_16:  rcall us_8
+us_8:   rcall us_4
+us_4:   rcall us_2
+us_2:   rcall us_1
+microsecond:
+us_1:   nop
+        ret
+
