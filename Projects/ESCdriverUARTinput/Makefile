@@ -1,5 +1,4 @@
 # **************************** Select Task Solution ****************************
-C_TARGET = bonus.c
 C_TARGET = ESCproject.c
 
 CLOCK = 16000000
@@ -7,8 +6,8 @@ CLOCK = 16000000
 
 # **************************** Device & Programmer ****************************
 DEVICE = atmega328
-DEVICE = atmega328p
-PROGRAMMER = -c usbasp -P usb
+# DEVICE = atmega328p
+# PROGRAMMER = -c usbasp -P usb
 PROGRAMMER = -c avrisp2 -P /dev/tty.usbmodem00065771
 # ******************************************************************************
 

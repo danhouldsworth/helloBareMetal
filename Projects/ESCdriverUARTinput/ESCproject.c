@@ -44,66 +44,94 @@ void readFromRxBuffer(){
 
     if (RUNNING_AUTOMATED_TEST){
         switch (systemTicks){
-            case 1000: duty = 1150; displayDuty(); break;
-            case 4000: duty = 1550; displayDuty(); break;
-            case 5000: duty = 1750; displayDuty(); break;
-            case 6000: duty = 1950; displayDuty(); break;
-            case 7000: duty = 1750; displayDuty(); break;
-            case 8000: duty = 1550; displayDuty(); break;
-            case 9000:
-                duty =  500;
-                displayDuty();
+            case  20: USART0SendString("THREE...!\r\n");        break;
+            case  30: USART0SendString("TWO...!\r\n");          break;
+            case  40: USART0SendString("ONE...!\r\n");          break;
+            case  50: duty = 1450; displayDuty();               break;
+            case  90: USART0SendString("TAKE PHOTO NOW!\r\n");  break;
+            case 100: duty = 1700; displayDuty();               break;
+            case 140: USART0SendString("TAKE PHOTO NOW!\r\n");  break;
+            case 150: duty = 1950; displayDuty();               break;
+            case 190: USART0SendString("TAKE PHOTO NOW!\r\n");  break;
+            case 200: duty = 1700; displayDuty();               break;
+            case 240: USART0SendString("TAKE PHOTO NOW!\r\n");  break;
+            case 250: duty = 1450; displayDuty();               break;
+            case 290: USART0SendString("TAKE PHOTO NOW!\r\n");  break;
+            case 300: {
+                duty = 1050;
+                USART0SendString("*\r\n* TEST STILL RUNNING!!!! STAY CLEAR OF ROTOR *\r\n*\r\n");
+                break;
+            }
+            case 340: USART0SendString("TAKE PHOTO NOW!\r\n");  break;
+            case 350: duty = 1450; displayDuty();               break;
+            case 390: USART0SendString("TAKE PHOTO NOW!\r\n");  break;
+            case 400: duty = 1700; displayDuty();               break;
+            case 440: USART0SendString("TAKE PHOTO NOW!\r\n");  break;
+            case 450: duty = 1950; displayDuty();               break;
+            case 490: USART0SendString("TAKE PHOTO NOW!\r\n");  break;
+            case 500: duty = 1700; displayDuty();               break;
+            case 540: USART0SendString("TAKE PHOTO NOW!\r\n");  break;
+            case 550: duty = 1450; displayDuty();               break;
+            case 590: USART0SendString("TAKE PHOTO NOW!\r\n");  break;
+            case 600:
+                duty =  900;
                 USART0SendString("FINISHED & DISARMED\r\n");
                 RUNNING_AUTOMATED_TEST = 0;
                 break;
         }
-
     }
-    if (rcvdPtr == readPtr) return;
+    else if (rcvdPtr == readPtr) return;
+    else {
+        uint8_t u8TempData = *readPtr++;
+        if (readPtr > (ringBufferRecv + RING_BUFF_SIZE)) readPtr = ringBufferRecv;  // Wrap the readPtr round the ring
 
-    uint8_t u8TempData = *readPtr++;
-    if (readPtr > (ringBufferRecv + RING_BUFF_SIZE)) readPtr = ringBufferRecv;  // Wrap the readPtr round the ring
-
-    switch (u8TempData) {
-        case ' ':
-            duty =  500;
-            displayDuty();
-            displayStep();
-            USART0SendString("FINISHED & DISARMED\r\n");
-            RUNNING_AUTOMATED_TEST = 0;
-            break;
-        case '\r':
-        case '\n':
-            USART0SendString("\r\n");
-            break;
-        case '1': stepSize = 1;         displayStep();break;
-        case '2': stepSize = 10;        displayStep();break;
-        case '3': stepSize = 100;       displayStep();break;
-        case '4': stepSize = 500;       displayStep();break;
-        case '5': stepSize = 1000;      displayStep();break;
-        case '-':
-        case '_':
-        case ',':
-        case '<':
-            duty -= stepSize;
-            if (duty < MIN_PWM) duty = MIN_PWM;
-            displayDuty();
-            break;
-        case '=':
-        case '+':
-        case '.':
-        case '>':
-            duty += stepSize;
-            if (duty > MAX_PWM) duty = MAX_PWM;
-            displayDuty();
-            break;
-        case 'G':
-            systemTicks = 0;
-            RUNNING_AUTOMATED_TEST = 1;
-            USART0SendString("STAND BACK...!\r\n");
-            break;
-        default:
-            USART0QueueByte(u8TempData);
+        switch (u8TempData) {
+            case ' ':
+                duty =  900;
+                displayDuty();
+                displayStep();
+                USART0SendString("FINISHED & DISARMED\r\n");
+                RUNNING_AUTOMATED_TEST = 0;
+                break;
+            case '\r':
+            case '\n':
+                USART0SendString("\r\n");
+                break;
+            case '1': stepSize = 1;         displayStep();break;
+            case '2': stepSize = 10;        displayStep();break;
+            case '3': stepSize = 100;       displayStep();break;
+            case '4': stepSize = 500;       displayStep();break;
+            case '5': stepSize = 1000;      displayStep();break;
+            case '-':
+            case '_':
+            case ',':
+            case '<':
+                duty -= stepSize;
+                if (duty < MIN_PWM) duty = MIN_PWM;
+                displayDuty();
+                break;
+            case '=':
+            case '+':
+            case '.':
+            case '>':
+                duty += stepSize;
+                if (duty > MAX_PWM) duty = MAX_PWM;
+                displayDuty();
+                break;
+            case 'G':
+                systemTicks = 0; // So full test fits within 16bit timer without rollover
+                RUNNING_AUTOMATED_TEST = 1;
+                duty = 1050; // Ensure Armed
+                USART0SendString("\r\n1. ESC sticker?\r\n");
+                USART0SendString("\r\n2. Prop sticker?\r\n");
+                USART0SendString("\r\n3. Motor Temp in Shot?\r\n");
+                USART0SendString("\r\n4. ESC Temp in Shot?\r\n");
+                USART0SendString("\r\n5. All meters ON and ZEROed?\r\n");
+                USART0SendString("\r\nSTAND BACK...!\r\n");
+                break;
+            default:
+                USART0QueueByte(u8TempData);
+        }
     }
 
     OCR0B = (uint8_t)(TOP * duty/2500);

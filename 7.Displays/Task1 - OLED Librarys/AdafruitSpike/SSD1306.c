@@ -122,33 +122,33 @@ void displaySPItotal(){
 
 void CSport(uint8_t state){
 	if (state == ON) {
-		PORTC |=  (1 << PORTC1);
+		PORTB |=  (1 << PORTB2);
 		// USART0SendString("CS1\r\n");
 	}
 	else if (state == OFF) {
-		PORTC &= ~(1 << PORTC1);
+		PORTB &= ~(1 << PORTB2);
 		// USART0SendString("CS0\r\n");
 	}
 	else USART0SendString("CS BUG!\r\n");
 }
 void DCport(uint8_t state){
 	if (state == ON){
-		PORTC |=  (1 << PORTC2);
+		PORTB |=  (1 << PORTB1);
 		// USART0SendString("D/C1\r\n");
 	}
 	else if (state == OFF){
-		PORTC &= ~(1 << PORTC2);
+		PORTB &= ~(1 << PORTB1);
 		// USART0SendString("D/C0\r\n");
 	}
 	else USART0SendString("DC BUG!\r\n");
 }
 void RSTport(uint8_t state){
 	if (state == ON) {
-		PORTC |=  (1 << PORTC3);
+		// PORTB |=  (1 << PORTC3);
 		// USART0SendString("RST1\r\n");
 	}
 	else if (state == OFF) {
-		PORTC &= ~(1 << PORTC3);
+		// PORTB &= ~(1 << PORTC3);
 		// USART0SendString("RST0\r\n");
 	}
 	else USART0SendString("RESET BUG!\r\n");
@@ -221,16 +221,18 @@ void SSD1306_display(void) {
 
 void initHW_SPI(){
 	//	CS 		DC 		RST
-	DDRC |= (1 << DDC1) | 	(1 << DDC2) | 	(1 << DDC3); 		// GPIO pins to control OLED slave
-	PORTC = 1 << PORTC3; // Try and leave reset to manual
+	// DDRC |= (1 << DDC1) | 	(1 << DDC2) | 	(1 << DDC3); 		// GPIO pins to control OLED slave
+    PORTB = DDRB = (1 << DDB3) | (1 << DDB5) | (1 << DDB2) | (1 << DDB1); // MOSI SCK SS D/C
+
 	// PRR &= ~(1<<PRSPI);  // clear the power down bit
 	/* Set MOSI, SCK & SS as output and leave High*/
 	//  	MOSI  		SCK 		SS
-	DDRB |=	(1 << DDB3) | 	(1 << DDB5) | 	(1 << DDB2);   		// NOTE!! SPI will hang if SS not set as output
-	PORTB = 0;//(1 << PORTB3)| 	(1 << PORTB5);//| 	(1 << PORTB2); 	// But doesn't seem to care if set low or high
+	// DDRB |=	(1 << DDB3) | 	(1 << DDB5) | 	(1 << DDB2);   		// NOTE!! SPI will hang if SS not set as output
+	// PORTB = 0;//(1 << PORTB3)| 	(1 << PORTB5);//| 	(1 << PORTB2); 	// But doesn't seem to care if set low or high
 
 	/* Enable SPI, Master, set clock rate fck/16 */
 	SPCR = (0 << SPIE) | (1 << SPE) | (1 << MSTR) | (0 << SPR1) | (0 << SPR0) | (0 << CPOL) | (0 << CPHA);
+    SPSR = (1 << SPI2X);
 	// Disable hwSPI use swSPI
 	// SPCR = 0;
 	CSport(ON);

@@ -14,8 +14,8 @@
 #define USART_BAUDRATE 115200
 // Calc UBBR = ((F_CPU / (USART_BAUDRATE * 16UL))) - 1
 // However, needs to be an int, and don't want risk of truncation down so easier to set manually (for higher BAUDs)
-#define UBRR_VALUE 8
-#define RING_BUFF_SIZE 10
+#define UBRR_VALUE 3
+#define RING_BUFF_SIZE 100
 // --
 
 
@@ -79,7 +79,7 @@ void initPWM(uint8_t TOP){ // Also used for the system timer!!
     TCCR0B |= (1 << WGM02); TCCR0A |= (1 << WGM01) | (1 << WGM00);
 
     // Set Clock Select (100 = 1/256) (101 = 1/1024)
-    TCCR0B |= (1 << CS02) | (0 << CS01) | (1 << CS00);
+    TCCR0B |= (1 << CS02) | (0 << CS01) | (0 << CS00);
 
     // Enable/Disable interupts OCA/OCB/Overflow
     TIMSK0 |= (0 << OCIE0B) + (0 << OCIE0A) + (1 << TOIE0);

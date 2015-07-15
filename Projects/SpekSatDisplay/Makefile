@@ -1,45 +1,24 @@
 # **************************** Select Task Solution ****************************
-C_TARGET = hello_OLED.c
-# C_TARGET = hello_graphics.c
-# C_TARGET = hello_logo.c
-CLOCK = 16000000
+C_TARGET = internal.c
 CLOCK = 8000000
 # ******************************************************************************
 
 # **************************** Device & Programmer ****************************
 DEVICE = atmega328p
+# PROGRAMMER = -c usbasp -P usb
 PROGRAMMER = -c avrisp2 -P /dev/tty.usbmodem00065771
 # ******************************************************************************
 
 # ****************************** Short cut macros ******************************
-AVRDUDE = avrdude $(PROGRAMMER) -p $(DEVICE) -U flash:w:main.hex:i
+AVRDUDE = avrdude $(PROGRAMMER) -p $(DEVICE)
 # ******************************************************************************
 
-INCLUDES += u8g_clip.c
-INCLUDES += u8g_com_api.c
-INCLUDES += u8g_com_atmega_hw_spi.c
-INCLUDES += u8g_com_io.c
-INCLUDES += u8g_delay.c
-INCLUDES += u8g_dev_ssd1306_128x64.c
-INCLUDES += u8g_font.c
-INCLUDES += u8g_font_data.c
-INCLUDES += u8g_ll_api.c
-INCLUDES += u8g_page.c
-INCLUDES += u8g_pb.c
-INCLUDES += u8g_pb8v1.c
-INCLUDES += u8g_state.c
-
-COMMON_FLAGS += -g -Os -Wall -funsigned-char -funsigned-bitfields
-COMMON_FLAGS += -ffunction-sections -fdata-sections
-COMMON_FLAGS += -Wl,--gc-sections
-COMMON_FLAGS += -Wl,--relax -mcall-prologues
-CFLAGS = $(COMMON_FLAGS) -std=gnu99 -Wstrict-prototypes
-
+CFLAGS = -Os -Wall -std=gnu99
 
 all: build
 
 build:
-	# Compiling C with avr-gcc to main.elf
+	# Compiling $(C_TARGET) with avr-gcc to main.elf
 	@avr-gcc $(CFLAGS) -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) $(INCLUDES) $(C_TARGET) -o main.elf
 
 	# Converting to .hex
@@ -48,8 +27,17 @@ build:
 	# Information about the flash.hex
 	@avr-size --format=avr --mcu=$(DEVICE) main.hex
 
+	# Set eFuse for default disable BOD
+	# $(AVRDUDE) -U efuse:w:0x07:m
+	# Set hFuse for Enable SPIprogramming, min BootSector and disable RST-->BOOT
+	# $(AVRDUDE) -U hfuse:w:0xdf:m
+	# Set lFuse for internal 8MHz clk / 1
+	# $(AVRDUDE) -U lfuse:w:0xe2:m
+	# Set lFuse for Ext Crystal Oscillator / max start up / clk / 1
+	# $(AVRDUDE) -U lfuse:w:0xf7:m
+
 	# Flash C $(C_TARGET).hex to chip
-	$(AVRDUDE)
+	$(AVRDUDE) -U flash:w:main.hex:i
 
 clean:
 	@rm -f *.cof *.hex *.obj *.elf
