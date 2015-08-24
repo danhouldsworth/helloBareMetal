@@ -12,6 +12,8 @@ uint8_t satFrame[16];
 uint8_t *satByte = satFrame;
 
 void initUSART0();
+void computeRC();
+void displayChannels();
 
 void bootOLED(uint8_t *ptr){
     for (uint8_t i = 0; i < 10; i++){
@@ -80,12 +82,17 @@ void testDummyRC(){
 }
 void computeRC(){
     // if (satFrame[0] != 0x03) return;
-
+// // uint8_t channel =0;
     for (uint8_t frameByte = 3; frameByte < 16; frameByte +=2){
-        uint8_t channel = (0b111000 & satFrame[frameByte - 1]) >> 3;
-        channelVals[channel] = ((uint16_t)(satFrame[frameByte - 1] & 0b111 ) << 7) + (satFrame[frameByte] >> 1);
+        uint8_t channel = 0b111 & (satFrame[frameByte - 1] >> 3);
+        // if (channel == 0){
+        channelVals[channel] = ((uint32_t)(satFrame[frameByte - 1] & 0b111 ) << 8) + satFrame[frameByte];
+        // }
     }
 
+    // for (uint8_t channel = 0; channel < 8; channel++){
+        // channelVals[channel] = satFrame[channel];
+    // }
 }
 void displayChannels(){
 
@@ -94,7 +101,7 @@ void displayChannels(){
     PORTB &= ~(1 << PORTB2);
     for (uint8_t col = 0; col < 8; col++){
         for (uint8_t x = 0; x < 128; x++){
-            if (x < (uint8_t)(channelVals[col] >> 3)) {
+            if (x < (uint8_t)(channelVals[col] >>4)) {
                 SPDR = 255;
             // } else if (x == (channelVals[col] >> 4)) {
                 // SPDR = 255;// >> (7 - (channelVals[col] & 0b00001111) >> 2);
