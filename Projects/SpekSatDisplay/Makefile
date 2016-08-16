@@ -19,7 +19,7 @@ all: build
 
 build:
 	# Compiling $(C_TARGET) with avr-gcc to main.elf
-	@avr-gcc $(CFLAGS) -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) $(INCLUDES) $(C_TARGET) -o main.elf
+	@avr-gcc $(CFLAGS) -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) $(C_TARGET) -o main.elf
 
 	# Converting to .hex
 	@avr-objcopy -O ihex main.elf main.hex

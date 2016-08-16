@@ -14,8 +14,9 @@
 #define USART_BAUDRATE 115200
 // Calc UBBR = ((F_CPU / (USART_BAUDRATE * 16UL))) - 1
 // However, needs to be an int, and don't want risk of truncation down so easier to set manually (for higher BAUDs)
-#define UBRR_VALUE 3
-#define RING_BUFF_SIZE 100
+// (See Datasheet 19.11 Examples of BaudRate) For 16MHz, 115200, normal asyncronous === 8 (== 3 @ 8MHz)
+#define UBRR_VALUE 8
+#define RING_BUFF_SIZE 200
 // --
 
 
@@ -122,16 +123,9 @@ ISR(USART_RX_vect){
 // -- Fires when Timer 0 reaches TOP (ie every 2.5ms)
 ISR(TIMER0_OVF_vect){
     static uint8_t counter = 0;
-    if (counter++ == 40) {      // Circa 10Hz
+    if (counter++ == 40) {      // Circa 10Hz (40 * 2.5ms = 100ms)
         readFromRxBuffer();
         counter = 0;
         systemTicks++;
-    }
-}
-void waitTicks(uint16_t ticks){
-    uint16_t oldTicks = systemTicks;
-    while (ticks--){
-        while (oldTicks == systemTicks); // Want to avoid issues of comparison at roll over
-        oldTicks = systemTicks;
     }
 }
