@@ -6,8 +6,8 @@ HIGH_FUSE = 0xdE
 LOW_FUSE = 0xff
 EXT_FUSE = 0x05
 
-PROGRAMMER = -c avrisp2 -P /dev/tty.usbmodem00065771
-# PROGRAMMER = -c usbasp -P usb
+# PROGRAMMER = -c avrisp2 -P /dev/tty.usbmodem00065771
+PROGRAMMER = -c usbasp -P usb
 # ******************************************************************************
 
 # ****************************** Short cut macros ******************************
@@ -51,3 +51,8 @@ read:
 #        +-------------------- CKDIV8 (1 = do not divide clock by 8)
 
 ###############################################################################
+clean:
+	#
+	# Cleaning...
+	@rm -f *.hex
+	#...done.

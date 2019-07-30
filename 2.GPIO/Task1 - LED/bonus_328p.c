@@ -14,8 +14,8 @@ int main(void) {
         unsigned char* PORTB_ptr = (unsigned char*)PORTB_addr;
 
         *DDRB_ptr  |= (1 << 7);
-        *PORTB_ptr |= (1 << 7);
-        // *PORTB_ptr &=~(1 << 7);
+        // *PORTB_ptr |= (1 << 7);
+        *PORTB_ptr &=~(1 << 7);
 
         for (;;) {
         // loop();

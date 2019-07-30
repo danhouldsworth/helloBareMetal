@@ -3,14 +3,16 @@ ASM_TARGET = main_1Hz.asm
 # C_TARGET = main.c
 C_TARGET = main.c
 
-C_CLOCK = 8000000
-# C_CLOCK = 16000000
+# C_CLOCK = 8000000
+C_CLOCK = 16000000
 # ******************************************************************************
 
 # **************************** Device & Programmer ****************************
 # DEVICE = t85
-DEVICE = atmega328
+# DEVICE = atmega328p
+DEVICE = atmega32u4
 PROGRAMMER = -c usbasp -P usb
+# PROGRAMMER = -c avrisp2 -P /dev/tty.usbmodem00065771
 # ******************************************************************************
 
 # ****************************** Short cut macros ******************************

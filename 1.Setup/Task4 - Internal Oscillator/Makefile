@@ -1,6 +1,6 @@
 # **************************** Device & Programmer ****************************
-DEVICE = atmega328
-# DEVICE = atmega328p
+# DEVICE = atmega328
+DEVICE = atmega328p
 
 HIGH_FUSE = 0xdE
 # Internal 8MHz
@@ -9,8 +9,8 @@ HIGH_FUSE = 0xdE
 LOW_FUSE = 0xff
 EXT_FUSE = 0x05
 
-# PROGRAMMER = -c avrisp2 -P /dev/tty.usbmodem00065771
-PROGRAMMER = -c usbasp -P usb
+PROGRAMMER = -c avrisp2 -P /dev/tty.usbmodem00065771
+# PROGRAMMER = -c usbasp -P usb
 # ******************************************************************************
 
 # ****************************** Short cut macros ******************************

@@ -3,14 +3,15 @@
 ASM_TARGET = main_32u4.asm
 C_TARGET = main.c
 
-C_CLOCK = 16000000
+# C_CLOCK = 1000000
+C_CLOCK = 20000000
 # ******************************************************************************
 
 # **************************** Device & Programmer ****************************
-DEVICE = atmega328p
-# DEVICE = atmega32u4
-# PROGRAMMER = -c usbasp -P usb
-PROGRAMMER = -c avrisp2 -P /dev/tty.usbmodem00065771
+# DEVICE = atmega328p
+DEVICE = atmega32u4
+PROGRAMMER = -c usbasp -P usb
+# PROGRAMMER = -c avrisp2 -P /dev/tty.usbmodem00065771
 # ******************************************************************************
 
 # ****************************** Short cut macros ******************************
